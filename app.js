@@ -328,7 +328,7 @@ function renderPatterns(){
     : `<div class="muted small">When a dream comes to pass, open it and tap "Mark confirmed".</div>`;
 }
 
-function renderAll(){ renderPrayerWatch(); renderHome(); renderJournal(); renderPatterns(); renderSettings(); }
+function renderAll(){ renderPrayerWatch(); renderHome(); renderJournal(); renderPatterns(); renderPoster(); renderSettings(); }
 function renderSettings(){
   $("#peopleBox").value = people.join("\n");
   $("#notifToggle").checked = settings.notif && canNotify() && Notification.permission === "granted";
@@ -477,4 +477,229 @@ if (openAlerts.length && settings.lastOpenNotif !== today){
 }
 if ("serviceWorker" in navigator && location.protocol.startsWith("http")){
   navigator.serviceWorker.register("sw.js").catch(()=>{});
+}
+
+/* ================= LIVING POSTER ================= */
+const SYMBOL_MEANING = {
+  "Fire":"Presence of God, calling, purification, warning",
+  "Water":"Cleansing, the Holy Spirit, overwhelming emotions, transition",
+  "Vehicles":"Journey, direction, acceleration, assignment",
+  "Animals":"Spirits, enemies, instincts, protection, warnings",
+  "School":"Training, testing, being taught",
+  "Houses":"Assignment areas, spiritual states, seasons",
+  "Time":"Kairos time, divine appointments, urgency",
+  "Keys & doors":"Access, revelation, authority, hidden solutions",
+  "Weapons":"Spiritual battles, authority, protection, deliverance",
+  "Heaven":"Revelation, God's realm, angelic activity",
+  "Money":"Provision, stewardship, favour",
+  "Church":"Ministry, calling, the fellowship"
+};
+const PHASE_NAME = {
+  warfare:"Warfare & discernment", calling:"Calling & commissioning",
+  revelation:"Revelation & awakening", warning:"Testing & warning",
+  healing:"Healing & freedom", family:"Family & foundations",
+  provision:"Provision & open doors", growth:"Refining & humility"
+};
+/* the ascent path control points (x,y in a 360x230 viewBox) */
+const ASCENT = [[26,208],[70,196],[112,168],[150,162],[190,128],[228,108],[262,78],[292,52]];
+function ascentPoint(t){ /* linear interpolation by cumulative length */
+  const segs = []; let total = 0;
+  for (let i=0;i<ASCENT.length-1;i++){
+    const dx=ASCENT[i+1][0]-ASCENT[i][0], dy=ASCENT[i+1][1]-ASCENT[i][1];
+    const L=Math.hypot(dx,dy); segs.push(L); total+=L;
+  }
+  let d = t*total;
+  for (let i=0;i<segs.length;i++){
+    if (d<=segs[i]){ const f=d/segs[i];
+      return [ASCENT[i][0]+(ASCENT[i+1][0]-ASCENT[i][0])*f, ASCENT[i][1]+(ASCENT[i+1][1]-ASCENT[i][1])*f]; }
+    d-=segs[i];
+  }
+  return ASCENT[ASCENT.length-1];
+}
+function notableScore(e){
+  return (e.confirmed?100:0) + e.a.dangerScore*2 + e.a.syms.length*3 + (e.title?15:0);
+}
+function monthName(isoStr, short){
+  return new Date(isoStr+"T00:00").toLocaleDateString("en-ZA",{month: short?"short":"long"});
+}
+function renderPoster(){
+  const root = $("#posterRoot"); if (!root) return;
+  if (!entries.length){
+    root.innerHTML = `<div class="empty"><div class="m">Your poster is waiting.</div>It draws itself from your dreams — add or import some first.</div>`;
+    return;
+  }
+  const sorted = [...entries].sort((a,b)=>a.date.localeCompare(b.date));
+  const first = sorted[0].date, last = sorted[sorted.length-1].date;
+  const range = (monthName(first) + " " + first.slice(0,4) + " – " + monthName(last) + " " + last.slice(0,4)).toUpperCase();
+  const total = entries.length;
+  const conf = entries.filter(e=>e.confirmed).length;
+
+  /* themes */
+  const catCounts = {};
+  for (const e of entries) catCounts[e.a.primary] = (catCounts[e.a.primary]||0)+1;
+  const seg = Object.entries(catCounts).sort((a,b)=>b[1]-a[1]);
+  const themesHTML = seg.map(([id,n]) =>
+    `<div class="prow"><span class="sw" style="background:${CATS[id].hex}"></span>${CATS[id].label}<span class="pct">${Math.round(n/total*100)}%</span></div>`).join("");
+
+  /* three phases of the journey */
+  const third = Math.ceil(sorted.length/3);
+  const phases = [0,1,2].map(i => {
+    const slice = sorted.slice(i*third, (i+1)*third);
+    if (!slice.length) return null;
+    const cc = {}; for (const e of slice) cc[e.a.primary] = (cc[e.a.primary]||0)+1;
+    const dom = Object.entries(cc).sort((a,b)=>b[1]-a[1])[0][0];
+    const y1 = slice[0].date.slice(0,4), y2 = slice[slice.length-1].date.slice(0,4);
+    return { years: y1===y2 ? y1 : y1+"–"+y2, label: PHASE_NAME[dom] };
+  }).filter(Boolean);
+
+  /* milestones for the mountain: most significant dreams, in time order */
+  const milestones = [...entries].sort((a,b)=>notableScore(b)-notableScore(a)).slice(0,8)
+    .sort((a,b)=>a.date.localeCompare(b.date));
+  let mSvg = "";
+  milestones.forEach((e,i) => {
+    const [x,y] = ascentPoint((i+1)/(milestones.length+1));
+    mSvg += `<g data-open="${e.id}" style="cursor:pointer">
+      <circle cx="${x}" cy="${y}" r="9" fill="#0A111F" opacity="0"></circle>
+      <circle cx="${x}" cy="${y}" r="5" fill="${CATS[e.a.primary].hex}" stroke="#0A111F" stroke-width="1.5">
+        <title>${fmtDate(e.date)}${e.title? " — "+e.title : ""}</title></circle>
+      ${e.confirmed ? `<circle cx="${x}" cy="${y}" r="8" fill="none" stroke="#D2A94E" stroke-width="1"></circle>`:""}
+    </g>`;
+  });
+  const mountainHTML = `
+  <svg viewBox="0 0 360 230" width="100%" role="img" aria-label="Your dream journey ascent map">
+    <polygon points="0,230 82,168 148,198 232,102 292,50 318,84 360,158 360,230" fill="#10192B"></polygon>
+    <polygon points="120,230 200,170 260,196 320,140 360,178 360,230" fill="#0D1524"></polygon>
+    <path d="M${ASCENT.map(p=>p.join(" ")).join(" L")}" fill="none" stroke="#D2A94E" stroke-width="1.2" stroke-dasharray="4 4" opacity=".8"></path>
+    <text x="292" y="40" text-anchor="middle" font-size="15" fill="#D2A94E">♛</text>
+    <text x="26" y="224" text-anchor="middle" font-size="9" fill="#8592A6">base camp</text>
+    <text x="292" y="228" text-anchor="middle" font-size="9" fill="#8592A6">the summit</text>
+    ${mSvg}
+  </svg>`;
+
+  /* year timelines */
+  const byYear = {};
+  for (const e of entries){ const y = e.date.slice(0,4); (byYear[y] = byYear[y]||[]).push(e); }
+  const yearsHTML = Object.keys(byYear).sort().map(y => {
+    const top = byYear[y].sort((a,b)=>notableScore(b)-notableScore(a)).slice(0,6)
+      .sort((a,b)=>a.date.localeCompare(b.date));
+    return `<div class="yearlabel">${y} <span class="muted small">· ${byYear[y].length} dreams</span></div>
+      <div class="yeardots">${top.map(e =>
+        `<button class="ydot" data-open="${e.id}">
+          <div class="mc" style="background:${CATS[e.a.primary].hex}">${monthName(e.date,true).toUpperCase()}</div>
+          <div class="tt">${e.title || e.text.slice(0,34)+"…"}</div>
+        </button>`).join("")}</div>`;
+  }).join("");
+
+  /* glossary with live counts */
+  const symCounts = {};
+  for (const e of entries) for (const s of e.a.syms) symCounts[s] = (symCounts[s]||0)+1;
+  const glosHTML = Object.entries(symCounts).sort((a,b)=>b[1]-a[1]).slice(0,8).map(([s,n]) =>
+    `<div class="grow"><span class="gname">${s}</span><span class="muted">${SYMBOL_MEANING[s]||""}</span><span class="gcount">×${n}</span></div>`).join("");
+
+  /* generated key insight */
+  const months = Math.max(1, Math.round((new Date(last) - new Date(first)) / (30.44*86400000)));
+  const topCat = seg[0], topSym = Object.entries(symCounts).sort((a,b)=>b[1]-a[1])[0];
+  const openWatch = alerts.filter(a=>!a.prayed).length;
+  let insight = `This record spans ${total} dreams across ${months} months. ${CATS[topCat[0]].label} leads your night watches at ${Math.round(topCat[1]/total*100)}%.`;
+  if (topSym) insight += ` ${topSym[0]} recurs in ${topSym[1]} dreams — a thread worth watching.`;
+  if (conf) insight += ` ${conf} dream${conf>1?"s have":" has"} already been confirmed in waking life.`;
+  insight += openWatch ? ` ${openWatch} name${openWatch>1?"s":""} on the prayer watch tonight.` : ` The prayer watch is clear tonight.`;
+
+  root.innerHTML = `<div class="poster">
+    <div class="crown">♛</div>
+    <h1>Keanen's<br>Prophetic Dream Journal</h1>
+    <div class="range">${range}</div>
+    <div class="quote">"In the last days, God says, I will pour out my Spirit on all people. Your young men shall see visions, your old men shall dream dreams." — Joel 2:28</div>
+    <div class="psec"><h3>Theme distribution</h3><div class="pthemes">${themesHTML}</div></div>
+    <div class="psec"><h3>The journey arc</h3>${mountainHTML}
+      <div class="phases">${phases.map(p=>`<div><div class="py">${p.years}</div><div class="pl">${p.label}</div></div>`).join("")}</div>
+      <div class="muted small" style="text-align:center;margin-top:10px">Each dot is a significant dream — tap it. Gold rings are confirmed.</div></div>
+    <div class="psec"><h3>Visual timeline</h3>${yearsHTML}</div>
+    <div class="psec"><h3>Recurring symbols</h3><div class="pglos">${glosHTML}</div>
+      <div class="muted small" style="text-align:center;margin-top:10px;font-style:italic">Symbols repeat to reveal patterns. Patterns reveal purpose.</div></div>
+    <div class="psec"><h3>Key insight</h3><div class="pinsight">${insight}</div></div>
+    <div class="pfoot">This is not just a journal.<br>This is your story with God.</div>
+    <button class="cta" id="posterExport" style="margin-top:22px">Save poster as image</button>
+  </div>`;
+  const ex = $("#posterExport"); if (ex) ex.onclick = () => exportPosterPNG({range, seg, total, conf, months, symCounts, milestones, phases});
+}
+
+/* ---------- PNG export of the poster ---------- */
+function exportPosterPNG(d){
+  try{
+    const W = 1080, H = 1700, cv = document.createElement("canvas");
+    cv.width = W; cv.height = H;
+    const x = cv.getContext("2d");
+    const GOLD = "#D2A94E", CREAM = "#EAE2CF", MUTED = "#8592A6";
+    x.fillStyle = "#0A111F"; x.fillRect(0,0,W,H);
+    x.strokeStyle = GOLD; x.lineWidth = 2; x.strokeRect(28,28,W-56,H-56);
+    x.textAlign = "center";
+    x.fillStyle = GOLD; x.font = "40px Georgia"; x.fillText("♛", W/2, 110);
+    x.font = "500 66px Georgia"; x.fillText("KEANEN'S", W/2, 190);
+    x.font = "500 44px Georgia"; x.fillText("PROPHETIC DREAM JOURNAL", W/2, 248);
+    x.fillStyle = CREAM; x.font = "26px Georgia";
+    x.fillText(d.range.split("").join("\u200a\u200a"), W/2, 300);
+    x.fillStyle = MUTED; x.font = "italic 25px Georgia";
+    x.fillText('"Your young men shall see visions,', W/2, 360);
+    x.fillText('your old men shall dream dreams." — Joel 2:28', W/2, 396);
+    /* donut */
+    const cx = 300, cy = 610, r = 130; let a = -Math.PI/2;
+    for (const [id,n] of d.seg){
+      const frac = n/d.total;
+      x.beginPath(); x.strokeStyle = CATS[id].hex; x.lineWidth = 52;
+      x.arc(cx, cy, r, a+0.02, a + frac*2*Math.PI - 0.02); x.stroke();
+      a += frac*2*Math.PI;
+    }
+    x.fillStyle = CREAM; x.font = "500 72px Georgia"; x.fillText(String(d.total), cx, cy+14);
+    x.fillStyle = MUTED; x.font = "20px Georgia"; x.fillText("DREAMS", cx, cy+48);
+    x.textAlign = "left";
+    let ly = 500;
+    for (const [id,n] of d.seg.slice(0,8)){
+      x.fillStyle = CATS[id].hex; x.fillRect(520, ly-16, 18, 18);
+      x.fillStyle = CREAM; x.font = "26px Georgia";
+      x.fillText(CATS[id].label + "  ·  " + Math.round(n/d.total*100) + "%", 552, ly);
+      ly += 42;
+    }
+    /* mountain */
+    const mx = t => 80 + t*(W-160), sc = p => [80 + (p[0]-20)/(300-20)*(W-160), 900 + (p[1]-40)/(215-40)*330];
+    x.fillStyle = "#10192B"; x.beginPath();
+    [[0,230],[82,168],[148,198],[232,102],[292,50],[318,84],[360,158],[360,230]].forEach((p,i)=>{
+      const q = [80 + p[0]/360*(W-160), 900 + (p[1]-40)/(230-40)*350];
+      i ? x.lineTo(q[0],q[1]) : x.moveTo(q[0],q[1]);
+    });
+    x.closePath(); x.fill();
+    x.strokeStyle = GOLD; x.lineWidth = 3; x.setLineDash([10,10]); x.beginPath();
+    ASCENT.forEach((p,i)=>{ const q = sc(p); i ? x.lineTo(q[0],q[1]) : x.moveTo(q[0],q[1]); });
+    x.stroke(); x.setLineDash([]);
+    d.milestones.forEach((e,i)=>{
+      const q = sc(ascentPoint((i+1)/(d.milestones.length+1)));
+      x.beginPath(); x.fillStyle = CATS[e.a.primary].hex;
+      x.arc(q[0], q[1], 12, 0, 7); x.fill();
+      if (e.confirmed){ x.beginPath(); x.strokeStyle = GOLD; x.lineWidth = 2.5; x.arc(q[0], q[1], 19, 0, 7); x.stroke(); }
+    });
+    const summit = sc(ASCENT[ASCENT.length-1]);
+    x.fillStyle = GOLD; x.font = "44px Georgia"; x.textAlign = "center";
+    x.fillText("♛", summit[0], summit[1]-26);
+    /* phases */
+    let px = 120, pw = (W-240)/d.phases.length;
+    x.font = "500 30px Georgia";
+    d.phases.forEach(p => {
+      x.fillStyle = GOLD; x.fillText(p.years, px+pw/2, 1330);
+      x.fillStyle = MUTED; x.font = "22px Georgia"; x.fillText(p.label, px+pw/2, 1364);
+      x.font = "500 30px Georgia"; px += pw;
+    });
+    /* symbols line */
+    const syms = Object.entries(d.symCounts).sort((a,b)=>b[1]-a[1]).slice(0,5)
+      .map(([s,n]) => s.toUpperCase() + " ×" + n).join("   ·   ");
+    x.fillStyle = CREAM; x.font = "24px Georgia"; x.fillText(syms, W/2, 1450);
+    x.fillStyle = MUTED; x.font = "italic 22px Georgia";
+    x.fillText("Symbols repeat to reveal patterns. Patterns reveal purpose.", W/2, 1492);
+    x.fillStyle = GOLD; x.font = "italic 30px Georgia";
+    x.fillText("This is not just a journal. This is your story with God.", W/2, 1590);
+    const a2 = document.createElement("a");
+    a2.href = cv.toDataURL("image/png");
+    a2.download = "night-watches-poster-" + new Date().toISOString().slice(0,10) + ".png";
+    a2.click();
+    toast("Poster image saved.");
+  } catch(e){ toast("Couldn't render the image on this device."); }
 }
