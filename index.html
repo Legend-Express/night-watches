@@ -9,240 +9,235 @@
 <meta name="apple-mobile-web-app-title" content="Night Watches">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-180.png">
-<title>Night Watches — dream journal</title>
+<title>Night Watches</title>
 <style>
 :root{
-  --night:#0A111F; --panel:#121B2C; --panel2:#182338; --line:#25334C;
+  --night:#0A111F; --panel:#111A2B; --panel2:#182338; --line:#223049;
   --gold:#D2A94E; --gold-dim:#8F7534; --cream:#EAE2CF; --muted:#8592A6;
   --warfare:#C25048; --calling:#D2A94E; --revelation:#8B7BD8; --warning:#E0913F;
   --healing:#4FA08B; --family:#5B9BB5; --provision:#7FA65A; --growth:#9AA5B5;
   --serif:"New York","Palatino Linotype",Palatino,Georgia,serif;
   --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
 }
-*{box-sizing:border-box;margin:0;padding:0}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html{background:var(--night)}
-body{
-  background:var(--night); color:var(--cream); font-family:var(--sans);
-  font-size:16px; line-height:1.55; min-height:100vh;
-  padding-bottom:calc(20px + env(safe-area-inset-bottom));
+body{background:var(--night);color:var(--cream);font-family:var(--sans);font-size:16px;line-height:1.55;min-height:100vh}
+.wrap{max-width:560px;margin:0 auto;padding:0 18px 110px}
+button{font-family:var(--sans)}
+/* header */
+header{display:flex;align-items:center;justify-content:space-between;padding:18px 18px 6px;max-width:560px;margin:0 auto}
+header .brand{font-family:var(--serif);font-size:15px;letter-spacing:.3em;color:var(--gold);text-transform:uppercase}
+header .gear{background:none;border:none;color:var(--muted);font-size:21px;cursor:pointer;padding:6px}
+/* hero */
+.hero{text-align:center;padding:26px 0 22px;background:radial-gradient(ellipse 100% 90% at 50% -30%,#17253F 0%,transparent 70%)}
+.hero .moon{font-size:34px;color:var(--gold);line-height:1}
+.hero .today{font-family:var(--serif);font-size:22px;margin:10px 0 3px}
+.hero .subtle{color:var(--muted);font-size:13.5px}
+.cta{
+  display:block;width:100%;margin:20px 0 6px;background:var(--gold);color:#1B1607;
+  border:none;border-radius:14px;padding:16px;font-size:17px;font-weight:600;cursor:pointer;
 }
-.wrap{max-width:560px;margin:0 auto;padding:0 16px}
-header{
-  text-align:center; padding:26px 16px 14px;
-  border-bottom:1px solid var(--line);
-  background:
-    radial-gradient(ellipse 90% 100% at 50% -20%, #16233C 0%, var(--night) 70%);
-}
-header .rule{width:44px;height:1px;background:var(--gold);margin:0 auto 10px;opacity:.8}
-h1{
-  font-family:var(--serif); font-weight:500; font-size:21px;
-  letter-spacing:.28em; text-transform:uppercase; color:var(--gold);
-}
-header .sub{font-size:12.5px;color:var(--muted);margin-top:4px;letter-spacing:.04em}
-nav{
-  position:sticky; top:0; z-index:20; background:rgba(10,17,31,.96);
-  backdrop-filter:blur(8px); border-bottom:1px solid var(--line);
-  display:flex; justify-content:center; gap:2px; padding:6px 4px;
-}
-nav button{
-  background:none;border:none;color:var(--muted);font-family:var(--sans);
-  font-size:13px;padding:8px 10px;border-radius:8px;cursor:pointer;
-  letter-spacing:.02em;
-}
-nav button.active{color:var(--gold);background:var(--panel2)}
-nav button:focus-visible{outline:2px solid var(--gold);outline-offset:1px}
-main{padding-top:16px}
-.view{display:none}
-.view.active{display:block}
-.card{
-  background:var(--panel);border:1px solid var(--line);border-radius:14px;
-  padding:16px;margin-bottom:14px;
-}
-h2{
-  font-family:var(--serif);font-weight:500;font-size:15px;color:var(--gold);
-  letter-spacing:.14em;text-transform:uppercase;margin-bottom:12px;
-}
-h2 .count{color:var(--muted);letter-spacing:0;font-family:var(--sans);font-size:13px}
-label{display:block;font-size:12.5px;color:var(--muted);margin:12px 0 5px;letter-spacing:.03em}
-input[type=text],input[type=date],textarea,select{
-  width:100%;background:var(--night);border:1px solid var(--line);
-  border-radius:10px;color:var(--cream);font-family:var(--sans);font-size:16px;
-  padding:11px 12px;
-}
-textarea{min-height:150px;line-height:1.6;resize:vertical}
-input:focus,textarea:focus,select:focus{outline:none;border-color:var(--gold-dim)}
-.btn{
-  display:inline-block;background:var(--gold);color:#1B1607;border:none;
-  font-family:var(--sans);font-size:15px;font-weight:600;padding:12px 20px;
-  border-radius:10px;cursor:pointer;letter-spacing:.02em;
-}
-.btn.secondary{background:var(--panel2);color:var(--cream);border:1px solid var(--line);font-weight:400}
-.btn.small{font-size:13px;padding:7px 12px}
-.btn.ghost{background:none;border:1px solid var(--line);color:var(--muted)}
-.btn:focus-visible{outline:2px solid var(--cream);outline-offset:2px}
-.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-.chip{
-  display:inline-block;font-size:12px;padding:3px 10px;border-radius:99px;
-  border:1px solid var(--line);color:var(--muted);margin:2px 4px 2px 0;
-}
-.chip.cat{border:none;font-weight:600}
-.chip.clickable{cursor:pointer}
+.cta:active{transform:scale(.99)}
+/* panels */
+.panel{background:var(--panel);border-radius:16px;padding:16px;margin-top:14px}
+h2{font-family:var(--serif);font-weight:500;font-size:14px;color:var(--muted);letter-spacing:.16em;text-transform:uppercase;margin-bottom:12px}
+h2 b{color:var(--gold);font-weight:500}
 .muted{color:var(--muted);font-size:13.5px}
 .small{font-size:12.5px}
 .gold{color:var(--gold)}
-.divider{height:1px;background:var(--line);margin:14px 0}
 /* prayer watch */
-#prayerWatch .alert{
-  border-left:3px solid var(--warning);background:var(--panel2);
-  border-radius:0 10px 10px 0;padding:10px 12px;margin-bottom:10px;
-}
-#prayerWatch .alert .who{font-family:var(--serif);font-size:16px}
-#prayerWatch .alert.prayed{border-left-color:var(--healing);opacity:.65}
-/* entries */
-.entry{
-  border-left:3px solid var(--line);background:var(--panel);
-  border-radius:0 12px 12px 0;padding:12px 14px;margin-bottom:12px;
-  border-top:1px solid var(--line);border-right:1px solid var(--line);border-bottom:1px solid var(--line);
-}
-.entry .date{font-size:12px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
-.entry .title{font-family:var(--serif);font-size:17px;margin:2px 0 6px}
-.entry .body{font-size:14.5px;color:#C9C2B2;white-space:pre-wrap;
-  display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
-.entry.open .body{display:block;-webkit-line-clamp:unset}
-.entry .meta{margin-top:8px}
-.entry .related{margin-top:8px;padding-top:8px;border-top:1px dashed var(--line);display:none}
-.entry.open .related{display:block}
-.entry .tools{margin-top:8px;display:none;gap:8px}
-.entry.open .tools{display:flex}
-.confirmedmark{color:var(--healing);font-size:12px}
-/* dashboard */
-.statgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.stat{background:var(--panel2);border-radius:10px;padding:10px 12px}
+.pw{background:linear-gradient(160deg,#1C2233,var(--panel));border:1px solid var(--gold-dim);border-radius:16px;padding:16px;margin-top:14px}
+.pw .who{font-family:var(--serif);font-size:19px;margin:2px 0}
+.pw .actions{display:flex;gap:8px;margin-top:10px}
+.pillbtn{background:var(--gold);border:none;color:#1B1607;font-weight:600;font-size:13.5px;padding:9px 14px;border-radius:99px;cursor:pointer}
+.pillbtn.ghost{background:transparent;border:1px solid var(--line);color:var(--muted);font-weight:400}
+/* stats */
+.stats3{display:flex;gap:10px;margin-top:14px}
+.stat{flex:1;background:var(--panel);border-radius:14px;padding:12px 8px;text-align:center;cursor:pointer}
 .stat .n{font-family:var(--serif);font-size:26px;color:var(--gold)}
-.stat .l{font-size:12px;color:var(--muted)}
-.legend{margin-top:10px}
-.legend .li{display:flex;align-items:center;gap:8px;font-size:13px;padding:3px 0}
-.legend .sw{width:10px;height:10px;border-radius:3px;flex:none}
-.legend .pct{margin-left:auto;color:var(--muted)}
-.bars{display:flex;align-items:flex-end;gap:4px;height:90px;margin-top:8px}
-.bars .b{flex:1;background:var(--gold-dim);border-radius:3px 3px 0 0;min-height:2px;position:relative}
-.bars .b span{position:absolute;bottom:-18px;left:50%;transform:translateX(-50%);font-size:9.5px;color:var(--muted)}
-.symrow{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px dashed var(--line);font-size:14px;cursor:pointer}
-.symrow:last-child{border-bottom:none}
-.symrow .c{color:var(--muted)}
-.searchbar{margin-bottom:12px}
-.filterinfo{margin-bottom:10px;display:none}
-.empty{
-  text-align:center;padding:34px 20px;color:var(--muted);
-  border:1px dashed var(--line);border-radius:14px;margin-bottom:14px;
-}
-.empty .m{font-family:var(--serif);font-size:17px;color:var(--cream);margin-bottom:6px}
-.toast{
-  position:sticky;bottom:12px;background:var(--gold);color:#1B1607;
-  border-radius:10px;padding:11px 14px;font-size:14px;font-weight:600;
-  margin:0 16px;display:none;text-align:center;z-index:30;
-}
-.toggle{display:flex;align-items:center;justify-content:space-between;padding:10px 0}
-.switch{position:relative;width:44px;height:26px;flex:none}
-.switch input{opacity:0;width:100%;height:100%;position:absolute;cursor:pointer;margin:0;z-index:2}
-.switch .tr{position:absolute;inset:0;background:var(--line);border-radius:13px;transition:background .15s}
-.switch .kn{position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:var(--cream);transition:transform .15s}
+.stat .l{font-size:11.5px;color:var(--muted)}
+/* donut */
+.donutwrap{display:flex;justify-content:center;position:relative;padding:6px 0}
+.donutwrap svg{width:190px;height:190px}
+.donutwrap svg circle{cursor:pointer;transition:opacity .15s}
+.donutcenter{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;pointer-events:none}
+.donutcenter .n{font-family:var(--serif);font-size:30px;color:var(--cream)}
+.donutcenter .l{font-size:11px;color:var(--muted);letter-spacing:.08em}
+.legend{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:8px}
+.lchip{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--muted);background:var(--panel2);border:none;border-radius:99px;padding:5px 11px;cursor:pointer}
+.lchip .sw{width:8px;height:8px;border-radius:50%}
+/* bars */
+.bars{display:flex;align-items:flex-end;gap:5px;height:84px;margin-top:6px}
+.bars button{flex:1;background:var(--gold-dim);border:none;border-radius:4px 4px 0 0;min-height:3px;cursor:pointer;position:relative;opacity:.85}
+.bars button span{position:absolute;bottom:-18px;left:50%;transform:translateX(-50%);font-size:9.5px;color:var(--muted)}
+/* journal */
+.searchbar input{width:100%;background:var(--panel);border:none;border-radius:12px;color:var(--cream);font-size:16px;padding:13px 14px;margin-top:14px}
+.searchbar input:focus{outline:1px solid var(--gold-dim)}
+.filterbar{display:none;margin-top:12px}
+.filterbar .fb{display:flex;align-items:center;justify-content:space-between;background:var(--panel2);border-radius:12px;padding:10px 14px;font-size:14px}
+.ecard{display:flex;gap:12px;background:var(--panel);border-radius:14px;padding:14px;margin-top:12px;cursor:pointer}
+.ecard:active{background:var(--panel2)}
+.ecard .edot{width:9px;height:9px;border-radius:50%;margin-top:7px;flex:none}
+.ecard .edate{font-size:11.5px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
+.ecard .etitle{font-family:var(--serif);font-size:17.5px;margin:2px 0}
+.ecard .eprev{font-size:13.5px;color:#A9A294;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.confmark{color:var(--healing)}
+.empty{text-align:center;padding:40px 20px;color:var(--muted)}
+.empty .m{font-family:var(--serif);font-size:18px;color:var(--cream);margin-bottom:6px}
+/* symbol cloud */
+.cloud{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.cloud button{background:var(--panel2);border:none;color:var(--cream);border-radius:99px;padding:7px 14px;cursor:pointer}
+.cloud button .c{color:var(--gold);font-size:.8em;margin-left:4px}
+.pgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.pgrid button{display:flex;justify-content:space-between;background:var(--panel2);border:none;color:var(--cream);border-radius:10px;padding:9px 12px;font-size:14px;cursor:pointer}
+.pgrid button span{color:var(--muted)}
+/* sheets (write / detail / settings) */
+.sheet{position:fixed;inset:0;background:var(--night);z-index:50;overflow-y:auto;display:none;-webkit-overflow-scrolling:touch}
+.sheet.open{display:block}
+.sheet .inner{max-width:560px;margin:0 auto;padding:14px 18px calc(40px + env(safe-area-inset-bottom))}
+.sheethead{display:flex;align-items:center;justify-content:space-between;padding:6px 0 14px;position:sticky;top:0;background:var(--night)}
+.sheethead .x{background:var(--panel);border:none;color:var(--muted);font-size:16px;width:36px;height:36px;border-radius:50%;cursor:pointer}
+.sheethead .t{font-family:var(--serif);font-size:15px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold)}
+label{display:block;font-size:12.5px;color:var(--muted);margin:14px 0 6px;letter-spacing:.03em}
+input[type=text],input[type=date],textarea{width:100%;background:var(--panel);border:none;border-radius:12px;color:var(--cream);font-family:var(--sans);font-size:16px;padding:12px 13px}
+textarea{min-height:200px;line-height:1.65;resize:vertical}
+input:focus,textarea:focus{outline:1px solid var(--gold-dim)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.chip{background:var(--panel2);border:none;color:var(--muted);font-size:12.5px;border-radius:99px;padding:5px 11px;cursor:pointer}
+.chip.cat{font-weight:600}
+.dtitle{font-family:var(--serif);font-size:24px;line-height:1.3;margin:6px 0}
+.dtext{white-space:pre-wrap;font-size:15.5px;color:#D6CFBE;margin-top:14px;line-height:1.7}
+.relrow{background:var(--panel);border:none;color:var(--cream);width:100%;text-align:left;border-radius:12px;padding:11px 13px;margin-top:8px;cursor:pointer;font-size:14px}
+.relrow .rd{color:var(--muted);font-size:12px}
+.dangerbox{background:#2A1E14;border-radius:12px;padding:12px;margin-top:14px;color:var(--warning);font-size:14px}
+/* settings bits */
+.srow{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 0;border-bottom:1px solid var(--line)}
+.srow:last-child{border-bottom:none}
+.switch{position:relative;width:46px;height:27px;flex:none}
+.switch input{opacity:0;position:absolute;inset:0;z-index:2;cursor:pointer;margin:0;width:100%;height:100%}
+.switch .tr{position:absolute;inset:0;background:var(--line);border-radius:14px}
+.switch .kn{position:absolute;top:3px;left:3px;width:21px;height:21px;border-radius:50%;background:var(--cream);transition:transform .15s}
 .switch input:checked ~ .tr{background:var(--gold-dim)}
-.switch input:checked ~ .kn{transform:translateX(18px)}
+.switch input:checked ~ .kn{transform:translateX(19px)}
+.btn{background:var(--panel2);border:1px solid var(--line);color:var(--cream);font-size:14px;padding:10px 16px;border-radius:10px;cursor:pointer}
+.btn.gold{background:var(--gold);color:#1B1607;border:none;font-weight:600}
+/* bottom nav */
+nav{position:fixed;bottom:0;left:0;right:0;z-index:40;background:rgba(10,17,31,.96);backdrop-filter:blur(10px);border-top:1px solid var(--line);display:flex;justify-content:space-around;padding:8px 0 calc(10px + env(safe-area-inset-bottom))}
+nav button{background:none;border:none;color:var(--muted);font-size:12px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;width:88px;padding:4px 0;border-radius:10px}
+nav button .ic{font-size:20px;line-height:1}
+nav button.active{color:var(--gold)}
+.toast{position:fixed;bottom:calc(86px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);background:var(--gold);color:#1B1607;border-radius:99px;padding:10px 18px;font-size:14px;font-weight:600;display:none;z-index:60;white-space:nowrap}
+.view{display:none}.view.active{display:block}
 @media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
 </style>
 </head>
 <body>
 <header>
-  <div class="rule"></div>
-  <h1>Night Watches</h1>
-  <div class="sub">Keanen's prophetic dream journal · Joel 2:28</div>
+  <div class="brand">Night Watches</div>
+  <button class="gear" id="gearBtn" aria-label="Settings">⚙︎</button>
 </header>
-<nav aria-label="Sections">
-  <button data-view="journal" class="active">Journal</button>
-  <button data-view="new">＋ New</button>
-  <button data-view="patterns">Patterns</button>
-  <button data-view="dash">Overview</button>
-  <button data-view="settings">Settings</button>
-</nav>
-<main class="wrap">
+<div class="wrap">
 
-<section id="prayerWatch"></section>
+<section id="view-home" class="view active">
+  <div class="hero">
+    <div class="moon">☾</div>
+    <div class="today" id="todayLine"></div>
+    <div class="subtle" id="verseLine">"Your young men shall see visions, your old men shall dream dreams."</div>
+    <button class="cta" id="writeBtn">＋ Write last night's dream</button>
+  </div>
+  <div id="prayerWatch"></div>
+  <div class="stats3" id="stats"></div>
+  <div class="panel">
+    <h2>Themes <b>· tap to explore</b></h2>
+    <div class="donutwrap">
+      <svg id="donut" viewBox="0 0 42 42" role="img" aria-label="Theme distribution"></svg>
+      <div class="donutcenter"><div class="n" id="donutN">0</div><div class="l">DREAMS</div></div>
+    </div>
+    <div class="legend" id="legend"></div>
+  </div>
+  <div class="panel"><h2>The last 12 months</h2><div class="bars" id="months"></div><div style="height:20px"></div></div>
+  <div class="panel"><h2>Recent dreams</h2><div id="recent"></div></div>
+</section>
 
-<section id="view-journal" class="view active">
-  <div class="searchbar"><input type="text" id="search" placeholder="Search dreams, people, symbols…" aria-label="Search dreams"></div>
-  <div class="filterinfo card" id="filterinfo"></div>
+<section id="view-journal" class="view">
+  <div class="searchbar"><input type="text" id="search" placeholder="Search dreams…" aria-label="Search dreams"></div>
+  <div class="filterbar" id="filterbar"><div class="fb"><span id="filterlabel"></span><button class="pillbtn ghost" id="clearFilter">Clear</button></div></div>
   <div id="entryList"></div>
 </section>
 
-<section id="view-new" class="view">
-  <div class="card">
-    <h2>New entry</h2>
-    <label for="nDate">Date of the dream</label>
+<section id="view-patterns" class="view">
+  <div class="panel"><h2>Recurring symbols <b>· tap one</b></h2><div class="cloud" id="symCloud"></div></div>
+  <div class="panel"><h2>People in your dreams</h2><div class="pgrid" id="peopleGrid"></div></div>
+  <div class="panel"><h2>Confirmed dreams</h2><div id="confirmedList"></div></div>
+</section>
+
+</div>
+
+<!-- write sheet -->
+<div class="sheet" id="writeSheet">
+  <div class="inner">
+    <div class="sheethead"><span class="t">New dream</span><button class="x" data-close="writeSheet">✕</button></div>
+    <label for="nDate">Night of</label>
     <input type="date" id="nDate">
     <label for="nTitle">Title (optional)</label>
     <input type="text" id="nTitle" placeholder="e.g. The vulture at the pool">
     <label for="nText">The dream</label>
     <textarea id="nText" placeholder="Write it exactly as you remember it…"></textarea>
-    <div style="margin-top:14px"><button class="btn" id="saveEntry">Save dream</button></div>
-    <div id="saveResult" style="margin-top:12px"></div>
+    <button class="cta" id="saveEntry">Save dream</button>
+    <div id="saveResult"></div>
   </div>
-</section>
+</div>
 
-<section id="view-patterns" class="view">
-  <div class="card"><h2>Recurring symbols</h2><div class="muted small" style="margin-bottom:8px">Symbols repeat to reveal patterns. Tap one to see every dream it appears in.</div><div id="symList"></div></div>
-  <div class="card"><h2>People in your dreams</h2><div id="peopleList"></div></div>
-  <div class="card"><h2>Confirmed dreams</h2><div class="muted small" style="margin-bottom:8px">Dreams you've marked as confirmed in real life.</div><div id="confirmedList"></div></div>
-</section>
+<!-- detail sheet -->
+<div class="sheet" id="detailSheet">
+  <div class="inner" id="detailInner"></div>
+</div>
 
-<section id="view-dash" class="view">
-  <div class="card"><h2>The record so far</h2><div class="statgrid" id="stats"></div></div>
-  <div class="card"><h2>Theme distribution</h2>
-    <div style="display:flex;gap:18px;align-items:center">
-      <svg id="donut" width="130" height="130" viewBox="0 0 42 42" role="img" aria-label="Theme distribution chart"></svg>
-      <div class="legend" id="legend" style="flex:1"></div>
+<!-- settings sheet -->
+<div class="sheet" id="settingsSheet">
+  <div class="inner">
+    <div class="sheethead"><span class="t">Settings</span><button class="x" data-close="settingsSheet">✕</button></div>
+    <div class="panel">
+      <h2>Import from Notes</h2>
+      <div class="muted small">Paste your whole dream note — every dated entry is detected automatically. Duplicates are skipped.</div>
+      <textarea id="importText" style="min-height:120px" placeholder="Paste your journal here…"></textarea>
+      <div style="display:flex;gap:8px;margin-top:12px">
+        <button class="btn" id="parseBtn">Preview</button>
+        <button class="btn gold" id="importBtn" style="display:none">Import</button>
+      </div>
+      <div id="importResult" class="muted small" style="margin-top:10px"></div>
+    </div>
+    <div class="panel">
+      <h2>Reminders</h2>
+      <div class="srow">
+        <div><div>Prayer notifications</div><div class="muted small">Fires when a dream flags someone in danger, and daily while alerts wait.</div></div>
+        <span class="switch"><input type="checkbox" id="notifToggle" aria-label="Prayer notifications"><span class="tr"></span><span class="kn"></span></span>
+      </div>
+      <button class="btn" id="testNotif" style="margin-top:8px">Send a test notification</button>
+    </div>
+    <div class="panel">
+      <h2>People watchlist</h2>
+      <div class="muted small">Names the app looks for when detecting who a dream is about.</div>
+      <textarea id="peopleBox" style="min-height:100px"></textarea>
+      <button class="btn" id="savePeople" style="margin-top:10px">Save & re-analyze</button>
+    </div>
+    <div class="panel">
+      <h2>Backup</h2>
+      <div class="muted small">Everything lives only on this device. Download a backup now and then.</div>
+      <div style="display:flex;gap:8px;margin-top:12px">
+        <button class="btn gold" id="exportBtn">Download backup</button>
+        <button class="btn" id="restoreBtn">Restore</button>
+        <input type="file" id="restoreFile" accept=".json" style="display:none">
+      </div>
     </div>
   </div>
-  <div class="card"><h2>Dreams per month</h2><div class="bars" id="months"></div><div style="height:20px"></div></div>
-</section>
+</div>
 
-<section id="view-settings" class="view">
-  <div class="card">
-    <h2>Import from Notes</h2>
-    <div class="muted small">Paste your whole dream note below — every entry that starts with a date line ("18 March 2024", "October 21st 2024 - Title", "06 February 2026 (Title)") is detected automatically. Duplicates are skipped.</div>
-    <textarea id="importText" placeholder="Paste your Notes dream journal here…"></textarea>
-    <div class="row" style="margin-top:12px">
-      <button class="btn secondary" id="parseBtn">Preview</button>
-      <button class="btn" id="importBtn" style="display:none">Import</button>
-    </div>
-    <div id="importResult" class="muted small" style="margin-top:10px"></div>
-  </div>
-  <div class="card">
-    <h2>Reminders</h2>
-    <div class="toggle">
-      <div><div>Prayer notifications</div><div class="muted small">A notification fires when a dream flags someone in danger, and when you open the app with unprayed alerts.</div></div>
-      <span class="switch"><input type="checkbox" id="notifToggle" aria-label="Enable prayer notifications"><span class="tr"></span><span class="kn"></span></span>
-    </div>
-    <button class="btn small ghost" id="testNotif">Send a test notification</button>
-  </div>
-  <div class="card">
-    <h2>People watchlist</h2>
-    <div class="muted small">Names the app looks for when detecting who a dream is about. One per line or comma-separated.</div>
-    <textarea id="peopleBox" style="min-height:100px"></textarea>
-    <div style="margin-top:10px"><button class="btn small secondary" id="savePeople">Save watchlist</button></div>
-  </div>
-  <div class="card">
-    <h2>Backup</h2>
-    <div class="muted small">Everything lives only on this device. Download a backup now and then — if you ever lose your phone, this file is your journal.</div>
-    <div class="row" style="margin-top:12px">
-      <button class="btn small secondary" id="exportBtn">Download backup</button>
-      <button class="btn small ghost" id="restoreBtn">Restore from backup</button>
-      <input type="file" id="restoreFile" accept=".json" style="display:none">
-    </div>
-  </div>
-</section>
-
-</main>
+<nav aria-label="Sections">
+  <button data-view="home" class="active"><span class="ic">☾</span>Tonight</button>
+  <button data-view="journal"><span class="ic">▤</span>Journal</button>
+  <button data-view="patterns"><span class="ic">✦</span>Patterns</button>
+</nav>
 <div class="toast" id="toast" role="status"></div>
 <script src="app.js"></script>
 </body>
